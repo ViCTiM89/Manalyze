@@ -86,9 +86,7 @@ class FirstRoute extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Manalyze'),
-      ),
+      appBar: AppBar(title: const Text('Manalyze')),
       body: Container(
         decoration: const BoxDecoration(color: appBackgroundColor),
         child: CustomScrollView(
@@ -114,9 +112,12 @@ class FirstRoute extends StatelessWidget {
                     text: 'Bounty',
                     imagePath: 'images/thb-252-swamp.jpg',
                     icon: Icons.workspace_premium_rounded,
-                    onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (_) => const BountyGame(key: ValueKey('bounty_game')),
-                    )),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            const BountyGame(key: ValueKey('bounty_game')),
+                      ),
+                    ),
                   ),
                   _GameButton(
                     text: 'Mechanics Guide',
@@ -128,17 +129,25 @@ class FirstRoute extends StatelessWidget {
                     text: 'Track Games',
                     imagePath: 'images/thb-254-forest.jpg',
                     icon: Icons.edit_note_rounded,
-                    onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (_) => const CommanderGameTracking(key: ValueKey('commander_tracking')),
-                    )),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const CommanderGameTracking(
+                          key: ValueKey('commander_tracking'),
+                        ),
+                      ),
+                    ),
                   ),
                   _GameButton(
                     text: 'Commander Stats',
                     imagePath: 'images/wastes.jpg',
                     icon: Icons.insights_rounded,
-                    onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                      builder: (_) => const StatisticsPage(key: ValueKey('statistics_page')),
-                    )),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const StatisticsPage(
+                          key: ValueKey('statistics_page'),
+                        ),
+                      ),
+                    ),
                   ),
                 ]),
                 gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
@@ -227,9 +236,14 @@ class _HomeHeader extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Your game night', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700)),
+          Text(
+            'Your game night',
+            style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700),
+          ),
           SizedBox(height: 6),
-          Text('Choose a tool to start playing or review your commander games.'),
+          Text(
+            'Choose a tool to start playing or review your commander games.',
+          ),
         ],
       ),
     );
@@ -238,36 +252,110 @@ class _HomeHeader extends StatelessWidget {
 
 void _showPlayerSelectionDialog(BuildContext context) {
   _showSelectionDialog(context, 'Choose player count', [
-    _SelectionOption('Two players', Icons.people_outline_rounded, () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const TwoPlayers(key: ValueKey('unique_key_for_gameTwoPlayers'))))),
-    _SelectionOption('Three players', Icons.people_outline_rounded, () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ThreePlayers(key: ValueKey('unique_key_for_gameThreePlayers'))))),
-    _SelectionOption('Four players', Icons.groups_rounded, () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FourPlayers(key: ValueKey('unique_key_for_gameFourPlayers'))))),
-    _SelectionOption('Five players', Icons.groups_rounded, () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FivePlayers(key: ValueKey('unique_key_game_five_players'))))),
+    _SelectionOption(
+      'Four players',
+      Icons.groups_rounded,
+      () => Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => const FourPlayers(
+            key: ValueKey('unique_key_for_gameFourPlayers'),
+          ),
+        ),
+      ),
+    ),
+    _SelectionOption(
+      'Three players',
+      Icons.people_outline_rounded,
+      () => Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => const ThreePlayers(
+            key: ValueKey('unique_key_for_gameThreePlayers'),
+          ),
+        ),
+      ),
+    ),
+    _SelectionOption(
+      'Five players',
+      Icons.groups_rounded,
+      () => Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) =>
+              const FivePlayers(key: ValueKey('unique_key_game_five_players')),
+        ),
+      ),
+    ),
+    _SelectionOption(
+      'Two players',
+      Icons.people_outline_rounded,
+      () => Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) =>
+              const TwoPlayers(key: ValueKey('unique_key_for_gameTwoPlayers')),
+        ),
+      ),
+    ),
   ]);
 }
 
 void _showPlaneSetSelectionDialog(BuildContext context) {
   _showSelectionDialog(context, 'Choose a Planechase set', [
-    _SelectionOption('All planes', Icons.public_rounded, () => _openPlaneChase(context, fetchAllPlanes)),
-    _SelectionOption('Planechase Anthology', Icons.collections_bookmark_rounded, () => _openPlaneChase(context, fetchAnthology)),
-    _SelectionOption('March of the Machine', Icons.auto_awesome_motion_rounded, () => _openPlaneChase(context, fetchMOM)),
-    _SelectionOption('Doctor Who', Icons.travel_explore_rounded, () => _openPlaneChase(context, fetchWHO)),
+    _SelectionOption(
+      'All planes',
+      Icons.public_rounded,
+      () => _openPlaneChase(context, fetchAllPlanes),
+    ),
+    _SelectionOption(
+      'Planechase Anthology',
+      Icons.collections_bookmark_rounded,
+      () => _openPlaneChase(context, fetchAnthology),
+    ),
+    _SelectionOption(
+      'March of the Machine',
+      Icons.auto_awesome_motion_rounded,
+      () => _openPlaneChase(context, fetchMOM),
+    ),
+    _SelectionOption(
+      'Doctor Who',
+      Icons.travel_explore_rounded,
+      () => _openPlaneChase(context, fetchWHO),
+    ),
   ]);
 }
 
 void _showMechanicSelectionDialog(BuildContext context) {
   _showSelectionDialog(context, 'Choose a mechanic', [
-    _SelectionOption('The Ring tempts you', Icons.ring_volume_rounded, () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const TheRing(key: ValueKey('unique_key_for_The_Ring'))))),
-    _SelectionOption('Dungeons', Icons.account_tree_rounded, () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const Dungeons(key: ValueKey('unique_key_for_Dungeons'))))),
+    _SelectionOption(
+      'The Ring tempts you',
+      Icons.ring_volume_rounded,
+      () => Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) =>
+              const TheRing(key: ValueKey('unique_key_for_The_Ring')),
+        ),
+      ),
+    ),
+    _SelectionOption(
+      'Dungeons',
+      Icons.account_tree_rounded,
+      () => Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) =>
+              const Dungeons(key: ValueKey('unique_key_for_Dungeons')),
+        ),
+      ),
+    ),
   ]);
 }
 
 void _openPlaneChase(BuildContext context, String apiUrl) {
-  Navigator.of(context).push(MaterialPageRoute(
-    builder: (_) => PlaneChase(
-      key: const ValueKey('unique_key_for_Plane_Chase'),
-      apiUrl: apiUrl,
+  Navigator.of(context).push(
+    MaterialPageRoute(
+      builder: (_) => PlaneChase(
+        key: const ValueKey('unique_key_for_Plane_Chase'),
+        apiUrl: apiUrl,
+      ),
     ),
-  ));
+  );
 }
 
 void _showSelectionDialog(
