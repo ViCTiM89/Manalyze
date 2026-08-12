@@ -242,7 +242,7 @@ class _HomeHeader extends StatelessWidget {
           ),
           SizedBox(height: 6),
           Text(
-            'Choose a tool to start playing or review your commander games.',
+            'Choose a tool to start playing or review commander stats.',
           ),
         ],
       ),

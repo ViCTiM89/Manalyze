@@ -3,6 +3,7 @@ import 'package:mongo_dart/mongo_dart.dart';
 import 'api_key.dart';
 
 class MongoService {
+  static const _maxAutocompleteResults = 20;
   static late Db _db;
   static late DbCollection _commanderCollection;
 
@@ -14,9 +15,14 @@ class MongoService {
 
   static Future<List<String>> searchCommanders(String query) async {
     try {
-      final results = await _commanderCollection.find({
-        'name': {'\$regex': query, '\$options': 'i'}
-      }).toList();
+      final results = await _commanderCollection
+          .find(
+            where
+                .match('name', query,
+                    caseInsensitive: true, escapePattern: true)
+                .fields(['name']).limit(_maxAutocompleteResults),
+          )
+          .toList();
 
       return results.map((e) => e['name'] as String).toList();
     } catch (e) {
@@ -26,19 +32,20 @@ class MongoService {
 
   static Future<List<String>> searchPartners(String query) async {
     try {
-      final results = await _commanderCollection.find({
-        'name': {'\$regex': query, '\$options': 'i'},
-        '\$or': [
-          {
-            'keywords': {
-              '\$in': ['Partner', 'Doctor\'s companion']
-            }
-          },
-          {
-            'type_line': {'\$regex': 'Background', '\$options': 'i'}
-          }
-        ],
-      }).toList();
+      final results = await _commanderCollection
+          .find(
+            where
+                .match('name', query,
+                    caseInsensitive: true, escapePattern: true)
+                .and(
+                  where.oneFrom('keywords', ['Partner', 'Doctor\'s companion']).or(
+                        where.match('type_line', 'Background',
+                            caseInsensitive: true),
+                      ),
+                )
+                .fields(['name']).limit(_maxAutocompleteResults),
+          )
+          .toList();
 
       return results.map((e) => e['name'] as String).toList();
     } catch (e) {
@@ -48,10 +55,15 @@ class MongoService {
 
   static Future<List<String>> searchCompanions(String query) async {
     try {
-      final results = await _commanderCollection.find({
-        'name': {'\$regex': query, '\$options': 'i'},
-        'keywords': 'Companion', // matches if "Companion" is in keywords array
-      }).toList();
+      final results = await _commanderCollection
+          .find(
+            where
+                .match('name', query,
+                    caseInsensitive: true, escapePattern: true)
+                .eq('keywords', 'Companion')
+                .fields(['name']).limit(_maxAutocompleteResults),
+          )
+          .toList();
 
       return results.map((e) => e['name'] as String).toList();
     } catch (e) {

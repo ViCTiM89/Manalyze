@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../constants.dart';
@@ -44,10 +43,6 @@ class _CommanderTrackerWidgetState extends State<CommanderTrackerWidget> {
   bool _isPartnerChecked = false;
   bool _isCompanionChecked = false;
   bool _isWinChecked = false;
-  List<String> _commanderSuggestions = [];
-  List<String> _partnerSuggestions = [];
-  List<String> _companionSuggestions = [];
-  Timer? _debounce;
   final double _rowBoxHeight = 12;
 
   @override
@@ -55,65 +50,40 @@ class _CommanderTrackerWidgetState extends State<CommanderTrackerWidget> {
     super.initState();
   }
 
-  @override
-  void dispose() {
-    _debounce?.cancel();
-    super.dispose();
-  }
-
-  void _onCommanderSearchChanged(String query) {
-    _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 500), () async {
-      final results = await MongoService.searchCommanders(query);
-      setState(() {
-        _commanderSuggestions = results;
-      });
-    });
-  }
-
-  void _onPartnerSearchChanged(String query) {
-    _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 500), () async {
-      final results = await MongoService.searchPartners(
-          query); // Replace with correct partner query if needed
-      setState(() {
-        _partnerSuggestions = results;
-      });
-    });
-  }
-
-  void _onCompanionSearchChanged(String query) {
-    _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 500), () async {
-      final results = await MongoService.searchCompanions(query);
-      setState(() {
-        _companionSuggestions = results;
-      });
-    });
-  }
-
-  Iterable<String> _commanderOptionsBuilder(TextEditingValue textEditingValue) {
-    if (textEditingValue.text.isEmpty) {
+  Future<Iterable<String>> _commanderOptionsBuilder(
+    TextEditingValue textEditingValue,
+  ) async {
+    final query = textEditingValue.text.trim();
+    if (query.isEmpty) {
       return const Iterable<String>.empty();
     }
 
-    return _commanderSuggestions;
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+    return MongoService.searchCommanders(query);
   }
 
-  Iterable<String> _partnerOptionsBuilder(TextEditingValue textEditingValue) {
-    if (textEditingValue.text.isEmpty) {
+  Future<Iterable<String>> _partnerOptionsBuilder(
+    TextEditingValue textEditingValue,
+  ) async {
+    final query = textEditingValue.text.trim();
+    if (query.isEmpty) {
       return const Iterable<String>.empty();
     }
 
-    return _partnerSuggestions;
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+    return MongoService.searchPartners(query);
   }
 
-  Iterable<String> _companionOptionsBuilder(TextEditingValue textEditingValue) {
-    if (textEditingValue.text.isEmpty) {
+  Future<Iterable<String>> _companionOptionsBuilder(
+    TextEditingValue textEditingValue,
+  ) async {
+    final query = textEditingValue.text.trim();
+    if (query.isEmpty) {
       return const Iterable<String>.empty();
     }
 
-    return _companionSuggestions;
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+    return MongoService.searchCompanions(query);
   }
 
   @override
@@ -152,22 +122,21 @@ class _CommanderTrackerWidgetState extends State<CommanderTrackerWidget> {
                     },
                     fieldViewBuilder:
                         (context, controller, focusNode, onFieldSubmitted) {
-                      controller.selection = TextSelection.fromPosition(
-                        TextPosition(offset: controller.text.length),
-                      );
-                      return TextField(
-                        controller: controller,
-                        focusNode: focusNode,
-                        decoration: textFieldStyle(widget.textFieldLabel),
-                        onChanged: (text) {
-                          widget.commanderController.text = text;
-                          _onCommanderSearchChanged(text);
+                          controller.selection = TextSelection.fromPosition(
+                            TextPosition(offset: controller.text.length),
+                          );
+                          return TextField(
+                            controller: controller,
+                            focusNode: focusNode,
+                            decoration: textFieldStyle(widget.textFieldLabel),
+                            onChanged: (text) {
+                              widget.commanderController.text = text;
+                            },
+                            onSubmitted: (text) {
+                              focusNode.unfocus();
+                            },
+                          );
                         },
-                        onSubmitted: (text) {
-                          focusNode.unfocus();
-                        },
-                      );
-                    },
                   ),
                 ),
               ),
@@ -179,7 +148,7 @@ class _CommanderTrackerWidgetState extends State<CommanderTrackerWidget> {
             children: [
               Checkbox(
                 shape: checkboxStyle(),
-                side: MaterialStateBorderSide.resolveWith(
+                side: WidgetStateBorderSide.resolveWith(
                   (states) => const BorderSide(width: 2.0, color: Colors.white),
                 ),
                 value: widget.isWin,
@@ -192,13 +161,10 @@ class _CommanderTrackerWidgetState extends State<CommanderTrackerWidget> {
                   }
                 },
               ),
-              SizedBox(
-                width: 60,
-                child: Text("Win", style: labelStyle()),
-              ),
+              SizedBox(width: 60, child: Text("Win", style: labelStyle())),
               Checkbox(
                 shape: checkboxStyle(),
-                side: MaterialStateBorderSide.resolveWith(
+                side: WidgetStateBorderSide.resolveWith(
                   (states) => const BorderSide(width: 2.0, color: Colors.white),
                 ),
                 value: _isPartnerChecked,
@@ -211,14 +177,11 @@ class _CommanderTrackerWidgetState extends State<CommanderTrackerWidget> {
                   }
                 },
               ),
-              SizedBox(
-                width: 60,
-                child: Text('Partner', style: labelStyle()),
-              ),
+              SizedBox(width: 60, child: Text('Partner', style: labelStyle())),
               const SizedBox(width: 10),
               Checkbox(
                 shape: checkboxStyle(),
-                side: MaterialStateBorderSide.resolveWith(
+                side: WidgetStateBorderSide.resolveWith(
                   (states) => const BorderSide(width: 2.0, color: Colors.white),
                 ),
                 value: _isCompanionChecked,
@@ -251,22 +214,28 @@ class _CommanderTrackerWidgetState extends State<CommanderTrackerWidget> {
                             widget.partnerController.text = selection;
                             FocusManager.instance.primaryFocus?.unfocus();
                           },
-                          fieldViewBuilder: (context, controller, focusNode,
-                              onFieldSubmitted) {
-                            controller.selection = TextSelection.fromPosition(
-                              TextPosition(offset: controller.text.length),
-                            );
-                            return TextField(
-                              controller: controller,
-                              focusNode: focusNode,
-                              decoration:
-                                  textFieldStyle(widget.optionalTextLabel),
-                              onChanged: (text) {
-                                widget.partnerController.text = text;
-                                _onPartnerSearchChanged(text);
+                          fieldViewBuilder:
+                              (
+                                context,
+                                controller,
+                                focusNode,
+                                onFieldSubmitted,
+                              ) {
+                                controller
+                                    .selection = TextSelection.fromPosition(
+                                  TextPosition(offset: controller.text.length),
+                                );
+                                return TextField(
+                                  controller: controller,
+                                  focusNode: focusNode,
+                                  decoration: textFieldStyle(
+                                    widget.optionalTextLabel,
+                                  ),
+                                  onChanged: (text) {
+                                    widget.partnerController.text = text;
+                                  },
+                                );
                               },
-                            );
-                          },
                         ),
                       )
                     : const SizedBox(),
@@ -288,22 +257,28 @@ class _CommanderTrackerWidgetState extends State<CommanderTrackerWidget> {
                             widget.companionController.text = selection;
                             FocusManager.instance.primaryFocus?.unfocus();
                           },
-                          fieldViewBuilder: (context, controller, focusNode,
-                              onFieldSubmitted) {
-                            controller.selection = TextSelection.fromPosition(
-                              TextPosition(offset: controller.text.length),
-                            );
-                            return TextField(
-                              controller: controller,
-                              focusNode: focusNode,
-                              decoration:
-                                  textFieldStyle(widget.companionTextLabel),
-                              onChanged: (text) {
-                                widget.companionController.text = text;
-                                _onCompanionSearchChanged(text);
+                          fieldViewBuilder:
+                              (
+                                context,
+                                controller,
+                                focusNode,
+                                onFieldSubmitted,
+                              ) {
+                                controller
+                                    .selection = TextSelection.fromPosition(
+                                  TextPosition(offset: controller.text.length),
+                                );
+                                return TextField(
+                                  controller: controller,
+                                  focusNode: focusNode,
+                                  decoration: textFieldStyle(
+                                    widget.companionTextLabel,
+                                  ),
+                                  onChanged: (text) {
+                                    widget.companionController.text = text;
+                                  },
+                                );
                               },
-                            );
-                          },
                         ),
                       )
                     : const SizedBox(),
