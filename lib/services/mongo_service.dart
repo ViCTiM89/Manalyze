@@ -165,6 +165,30 @@ class MongoService {
     return null; // fallback
   }
 
+  /// Returns commander documents keyed by their exact name in a single query.
+  /// This avoids one database round trip per commander when rendering lists.
+  static Future<Map<String, Map<String, dynamic>>> getCommandersByNames(
+    Iterable<String> names,
+  ) async {
+    final uniqueNames = names
+        .map((name) => name.trim())
+        .where((name) => name.isNotEmpty)
+        .toSet()
+        .toList();
+
+    if (uniqueNames.isEmpty) return {};
+
+    final collection = _db.collection('Commanders');
+    final documents = await collection.find({
+      'name': {'\$in': uniqueNames},
+    }).toList();
+
+    return {
+      for (final document in documents)
+        if (document['name'] is String) document['name'] as String: document,
+    };
+  }
+
   static Future<Map<String, dynamic>?> getCommanderByName(String name) async {
     final collection = _db.collection('Commanders');
     final doc = await collection.findOne({'name': name});

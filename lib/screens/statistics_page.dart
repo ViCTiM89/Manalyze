@@ -33,35 +33,47 @@ class _StatisticsPageState extends State<StatisticsPage> {
 
   Future<List<Map<String, dynamic>>> _initializeMongoAndLoadStats() async {
     final stats = await MongoService.fetchSortedStats('CommanderStats');
-
-    for (var stat in stats) {
+    final commanderNames = <String>{};
+    for (final stat in stats) {
       final commanderData = stat['commander'];
-
       if (commanderData is List) {
-        for (final commander in commanderData) {
-          final name = commander.toString().trim();
-          if (!_commanderImages.containsKey(name)) {
-            final imageUrl = await MongoService.fetchCommanderImage(name);
-            _commanderImages[name] = imageUrl;
-
-            final commanderData = await MongoService.getCommanderByName(name);
-            final legality = commanderData?['legalities']?['commander'];
-            _bannedCommanders[name] = legality == 'banned';
-            debugPrint('$legality');
-          }
-        }
-      } else {
-        final name = (commanderData ?? 'Unknown').toString().trim();
-        if (!_commanderImages.containsKey(name)) {
-          final imageUrl = await MongoService.fetchCommanderImage(name);
-          _commanderImages[name] = imageUrl;
-        }
+        commanderNames.addAll(commanderData.map((name) => name.toString()));
+      } else if (commanderData != null) {
+        commanderNames.add(commanderData.toString());
       }
+    }
+
+    final commanders = await MongoService.getCommandersByNames(commanderNames);
+    for (final entry in commanders.entries) {
+      final commander = entry.value;
+      _commanderImages[entry.key] = _imageUrlFromCommander(commander);
+      _bannedCommanders[entry.key] =
+          commander['legalities']?['commander'] == 'banned';
     }
 
     _allStats = stats;
     _filteredStats = stats;
     return stats;
+  }
+
+  String? _imageUrlFromCommander(Map<String, dynamic> commander) {
+    final imageUris = commander['image_uris'];
+    if (imageUris is Map && imageUris['art_crop'] is String) {
+      return imageUris['art_crop'] as String;
+    }
+
+    final cardFaces = commander['card_faces'];
+    if (cardFaces is List && cardFaces.isNotEmpty) {
+      final firstFace = cardFaces.first;
+      if (firstFace is Map) {
+        final faceImageUris = firstFace['image_uris'];
+        if (faceImageUris is Map && faceImageUris['art_crop'] is String) {
+          return faceImageUris['art_crop'] as String;
+        }
+      }
+    }
+
+    return null;
   }
 
   void _filterStats(String query) {
@@ -80,6 +92,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
   @override
   void dispose() {
     WakelockPlus.disable();
+    _searchController.dispose();
     super.dispose();
   }
 
