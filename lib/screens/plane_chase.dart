@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:manalyze/constants.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:manalyze/widgets/dice_roll_widget.dart';
 import 'dart:math';
 
-import '../constants.dart';
 import '../model/cards.dart';
 import '../services/card_api.dart';
 import '../widgets/app_bar_widget.dart';
@@ -11,7 +11,7 @@ import '../widgets/app_bar_widget.dart';
 class PlaneChase extends StatefulWidget {
   final String apiUrl;
 
-  const PlaneChase({required this.apiUrl, Key? key}) : super(key: key);
+  const PlaneChase({required this.apiUrl, super.key});
 
   @override
   State<PlaneChase> createState() => _PlaneChaseState();
@@ -90,7 +90,7 @@ class _PlaneChaseState extends State<PlaneChase> {
                 final typeLine = plane.typeLine;
                 return ListTile(
                   leading: CircleAvatar(
-                    backgroundColor: Colors.deepPurpleAccent,
+                    backgroundColor: appPrimaryColor,
                     child: Text(
                       '${index + 1}',
                       style: const TextStyle(color: Colors.white),
@@ -103,7 +103,7 @@ class _PlaneChaseState extends State<PlaneChase> {
                   subtitle: Text(typeLine),
                   trailing: const Icon(
                     Icons.arrow_forward,
-                    color: Colors.deepPurpleAccent,
+                    color: appPrimaryColor,
                   ),
                   onLongPress: () {
                     setState(() {
@@ -127,7 +127,7 @@ class _PlaneChaseState extends State<PlaneChase> {
                   height: 50.0,
                   width: 150.0,
                   decoration: BoxDecoration(
-                    color: Colors.deepPurpleAccent,
+                    color: appButtonColor,
                     borderRadius: BorderRadius.circular(15.0),
                     boxShadow: [
                       BoxShadow(
@@ -167,7 +167,7 @@ class _PlaneChaseState extends State<PlaneChase> {
     double offSet = screenHeight / 12;
 
     return Container(
-      decoration: BoxDecoration(gradient: backgroundGradient()),
+      decoration: const BoxDecoration(color: appBackgroundColor),
       child: Scaffold(
         //extendBodyBehindAppBar: true,
         appBar: const SharedAppBar(backgroundColor: appBarColor),
@@ -202,7 +202,7 @@ class _PlaneChaseState extends State<PlaneChase> {
                           vertical: 15,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.deepPurpleAccent, // Background color
+                          color: appButtonColor,
                           borderRadius: BorderRadius.circular(
                             20.0,
                           ), // Rounded corners

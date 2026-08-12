@@ -17,7 +17,7 @@ class _DungeonDetailState extends State<DungeonDetail> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(gradient: backgroundGradient()),
+      decoration: const BoxDecoration(color: appBackgroundColor),
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: const SharedAppBar(backgroundColor: appBarColor),
@@ -54,7 +54,7 @@ class _DungeonDetailState extends State<DungeonDetail> {
                     height: 50.0,
                     width: 150.0,
                     decoration: BoxDecoration(
-                      color: Colors.deepPurpleAccent,
+                      color: appButtonColor,
                       borderRadius: BorderRadius.circular(15.0),
                       boxShadow: [
                         BoxShadow(

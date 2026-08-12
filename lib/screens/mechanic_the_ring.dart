@@ -3,6 +3,7 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../constants.dart';
 import '../widgets/app_bar_widget.dart';
+import '../widgets/rulings_dialog.dart';
 
 const double ringLevelHeight = 90;
 const double ringLevelWidth = 300;
@@ -31,9 +32,7 @@ class TheRing extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        gradient: backgroundGradient(),
-      ),
+      decoration: const BoxDecoration(color: appBackgroundColor),
       child: const Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
@@ -96,105 +95,6 @@ class _MechanicTheRingState extends State<MechanicTheRing> {
     return ringLevel >= index ? temptingColorActive : temptingColorInactive;
   }
 
-  void _showRulingsDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-          title: Container(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: const Center(
-              child: Text(
-                "Rulings For\nThe Ring",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.deepPurpleAccent,
-                  letterSpacing: 0.5,
-                ),
-              ),
-            ),
-          ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: _buildRulingsWithSpacing(),
-            ),
-          ),
-          actions: [
-            Center(
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: Container(
-                  height: 50.0,
-                  width: 150.0,
-                  decoration: BoxDecoration(
-                    color: Colors.deepPurpleAccent,
-                    borderRadius: BorderRadius.circular(15.0),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        spreadRadius: 2,
-                        blurRadius: 3,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: const Center(
-                    child: Text(
-                      'Close',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            )
-          ],
-        );
-      },
-    );
-  }
-
-  List<Widget> _buildRulingsWithSpacing() {
-    List<Widget> widgets = [];
-
-    for (var i = 0; i < rulings.length; i++) {
-      widgets.add(
-        Container(
-          constraints: const BoxConstraints(
-            maxWidth: 300,
-          ),
-          child: Text(
-            rulings[i],
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.black87,
-              fontWeight: i == 0 ? FontWeight.bold : FontWeight.normal,
-              letterSpacing: 0.5,
-            ),
-          ),
-        ),
-      );
-      widgets.add(SizedBox(height: i == 0 ? 10 : 5));
-    }
-
-    if (widgets.isNotEmpty) {
-      widgets.removeLast();
-    }
-
-    return widgets;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -251,7 +151,11 @@ class _MechanicTheRingState extends State<MechanicTheRing> {
             const SizedBox(height: 20),
             GestureDetector(
               onTap: () {
-                _showRulingsDialog(context);
+                RulingsDialog.show(
+                  context,
+                  title: 'Rulings for The Ring',
+                  rulings: rulings,
+                );
               },
               child: Container(
                 height: 50.0,

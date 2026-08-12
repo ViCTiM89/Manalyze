@@ -191,7 +191,6 @@ class _CommanderTrackerWidgetState extends State<CommanderTrackerWidget> {
                     widget.onWinChanged!(_isWinChecked);
                   }
                 },
-                activeColor: Colors.deepPurpleAccent,
               ),
               SizedBox(
                 width: 60,
@@ -211,7 +210,6 @@ class _CommanderTrackerWidgetState extends State<CommanderTrackerWidget> {
                     widget.onPartnerChanged!(_isPartnerChecked);
                   }
                 },
-                activeColor: Colors.deepPurpleAccent,
               ),
               SizedBox(
                 width: 60,
@@ -232,7 +230,6 @@ class _CommanderTrackerWidgetState extends State<CommanderTrackerWidget> {
                     widget.onCompanionChanged!(_isCompanionChecked);
                   }
                 },
-                activeColor: Colors.deepPurpleAccent,
               ),
               SizedBox(
                 width: 80,

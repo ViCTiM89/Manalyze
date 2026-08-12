@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class AnimatedScaleButton extends StatefulWidget {
   final VoidCallback onTap;
   final double size;
-  final Color backgroundColor;
+  final Color? backgroundColor;
   final IconData icon;
   final Color iconColor;
 
@@ -11,7 +11,7 @@ class AnimatedScaleButton extends StatefulWidget {
     Key? key,
     required this.onTap,
     this.size = 60.0,
-    this.backgroundColor = Colors.deepPurpleAccent,
+    this.backgroundColor,
     this.icon = Icons.add,
     this.iconColor = Colors.white,
   }) : super(key: key);
@@ -79,7 +79,8 @@ class _AnimatedScaleButtonState extends State<AnimatedScaleButton>
           child: Center(
             child: CircleAvatar(
               radius: widget.size / 2 - 2,
-              backgroundColor: widget.backgroundColor,
+              backgroundColor:
+                  widget.backgroundColor ?? Theme.of(context).colorScheme.primary,
               child: Icon(
                 widget.icon,
                 size: widget.size / 2,

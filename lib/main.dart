@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:manalyze/services/mongo_service.dart';
 
 import 'constants.dart';
@@ -18,13 +17,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await MongoService.init('Commanders');
 
-  runApp(
-    const MaterialApp(
-      title: 'Manalyze',
-      home: FirstRoute(key: ValueKey<String>('unique_key_for_FirstRoute')),
-      debugShowCheckedModeBanner: false,
-    ),
-  );
+  runApp(const ManalyzeApp());
 }
 
 class ManalyzeApp extends StatelessWidget {
@@ -36,33 +29,49 @@ class ManalyzeApp extends StatelessWidget {
       title: 'Manalyze',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: appPrimaryColor,
+          brightness: Brightness.dark,
+          surface: appSurfaceColor,
+        ),
         fontFamily: 'Roboto',
-        textTheme: const TextTheme(
-          titleLarge: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-            letterSpacing: 0.5,
-          ),
-          labelLarge: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-            letterSpacing: 0.5,
-          ),
+        scaffoldBackgroundColor: appBackgroundColor,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: appBarColor,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          centerTitle: false,
+          titleTextStyle: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
+            backgroundColor: appButtonColor,
+            foregroundColor: Colors.white,
+            elevation: 0,
+            side: const BorderSide(color: appButtonBorderColor),
+            minimumSize: const Size.fromHeight(48),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(12),
             ),
-            padding: const EdgeInsets.symmetric(vertical: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
             textStyle: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 0.5,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
             ),
+          ),
+        ),
+        dialogTheme: DialogThemeData(
+          backgroundColor: appSurfaceColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(appRadius),
+          ),
+        ),
+        checkboxTheme: CheckboxThemeData(
+          fillColor: WidgetStateProperty.resolveWith(
+            (states) => states.contains(WidgetState.selected)
+                ? appPrimaryColor
+                : Colors.transparent,
           ),
         ),
       ),
@@ -76,91 +85,71 @@ class FirstRoute extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
-    final size = MediaQuery.of(context).size;
-    final buttonSize = size.width / 2.3;
-
     return Scaffold(
-      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text('Manalyze', style: appBarTextStyle()),
-        centerTitle: true,
-        backgroundColor: appBarColor, // Dark purple tone
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text('Manalyze'),
       ),
       body: Container(
-        decoration: BoxDecoration(gradient: backgroundGradient()),
-        child: Center(
-          child: Wrap(
-            spacing: 20,
-            runSpacing: 20,
-            alignment: WrapAlignment.center,
-            children: [
-              _GameButton(
-                size: buttonSize,
-                text: 'Life\nCounter',
-                imagePath: 'images/thb-250-plains.jpg',
-                onTap: () => _showPlayerSelectionDialog(context),
+        decoration: const BoxDecoration(color: appBackgroundColor),
+        child: CustomScrollView(
+          slivers: [
+            const SliverToBoxAdapter(child: _HomeHeader()),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
+              sliver: SliverGrid(
+                delegate: SliverChildListDelegate([
+                  _GameButton(
+                    text: 'Life Counter',
+                    imagePath: 'images/thb-250-plains.jpg',
+                    icon: Icons.favorite_rounded,
+                    onTap: () => _showPlayerSelectionDialog(context),
+                  ),
+                  _GameButton(
+                    text: 'Planechase',
+                    imagePath: 'images/thb-251-island.jpg',
+                    icon: Icons.public_rounded,
+                    onTap: () => _showPlaneSetSelectionDialog(context),
+                  ),
+                  _GameButton(
+                    text: 'Bounty',
+                    imagePath: 'images/thb-252-swamp.jpg',
+                    icon: Icons.workspace_premium_rounded,
+                    onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (_) => const BountyGame(key: ValueKey('bounty_game')),
+                    )),
+                  ),
+                  _GameButton(
+                    text: 'Mechanics Guide',
+                    imagePath: 'images/thb-253-mountain.jpg',
+                    icon: Icons.menu_book_rounded,
+                    onTap: () => _showMechanicSelectionDialog(context),
+                  ),
+                  _GameButton(
+                    text: 'Track Games',
+                    imagePath: 'images/thb-254-forest.jpg',
+                    icon: Icons.edit_note_rounded,
+                    onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (_) => const CommanderGameTracking(key: ValueKey('commander_tracking')),
+                    )),
+                  ),
+                  _GameButton(
+                    text: 'Commander Stats',
+                    imagePath: 'images/wastes.jpg',
+                    icon: Icons.insights_rounded,
+                    onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (_) => const StatisticsPage(key: ValueKey('statistics_page')),
+                    )),
+                  ),
+                ]),
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 280,
+                  mainAxisSpacing: 16,
+                  crossAxisSpacing: 16,
+                  childAspectRatio: 1.12,
+                ),
               ),
-              _GameButton(
-                size: buttonSize,
-                text: 'Plane\nChase',
-                imagePath: 'images/thb-251-island.jpg',
-                onTap: () => _showPlaneSetSelectionDialog(context),
-              ),
-              _GameButton(
-                size: buttonSize,
-                text: 'Bounty',
-                imagePath: 'images/thb-252-swamp.jpg',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) =>
-                          const BountyGame(key: ValueKey('bounty_game')),
-                    ),
-                  );
-                },
-              ),
-              _GameButton(
-                size: buttonSize,
-                text: 'Reading the Card\nDoes Not\nExplain the Card',
-                imagePath: 'images/thb-253-mountain.jpg',
-                onTap: () => _showMechanicSelectionDialog(context),
-              ),
-              _GameButton(
-                size: buttonSize,
-                text: 'Track Games',
-                imagePath: 'images/thb-254-forest.jpg',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const CommanderGameTracking(
-                        key: ValueKey('commander_tracking'),
-                      ),
-                    ),
-                  );
-                },
-              ),
-              _GameButton(
-                size: buttonSize,
-                text: 'Commander\nStatistics',
-                imagePath: 'images/wastes.jpg',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const StatisticsPage(
-                        key: ValueKey('statistics_page'),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -168,59 +157,58 @@ class FirstRoute extends StatelessWidget {
 }
 
 class _GameButton extends StatelessWidget {
-  final double size;
   final String text;
   final String imagePath;
+  final IconData icon;
   final VoidCallback onTap;
 
   const _GameButton({
-    required this.size,
     required this.text,
     required this.imagePath,
+    required this.icon,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
-          image: DecorationImage(
-            image: AssetImage(imagePath),
-            fit: BoxFit.cover,
-            colorFilter: ColorFilter.mode(
-              Colors.black.withOpacity(0.35),
-              BlendMode.darken,
-            ),
-          ),
-        ),
-        alignment: Alignment.center,
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Text(
-            text,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.titleLarge!.copyWith(
-              color: Colors.white,
-              shadows: [
-                Shadow(
-                  color: Colors.black.withOpacity(0.7),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
+    return Semantics(
+      button: true,
+      label: text,
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(appRadius),
+        clipBehavior: Clip.antiAlias,
+        child: Ink.image(
+          image: AssetImage(imagePath),
+          fit: BoxFit.cover,
+          child: InkWell(
+            onTap: onTap,
+            child: DecoratedBox(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0x22000000), Color(0xD9000000)],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
                 ),
-              ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Icon(icon, color: Colors.white, size: 28),
+                    const SizedBox(height: 8),
+                    Text(
+                      text,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
@@ -229,368 +217,98 @@ class _GameButton extends StatelessWidget {
   }
 }
 
+class _HomeHeader extends StatelessWidget {
+  const _HomeHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.fromLTRB(24, 28, 24, 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Your game night', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700)),
+          SizedBox(height: 6),
+          Text('Choose a tool to start playing or review your commander games.'),
+        ],
+      ),
+    );
+  }
+}
+
 void _showPlayerSelectionDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text(
-          "Select Number \n of Players",
-          textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.blueAccent,
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const FourPlayers(
-                          key: ValueKey<String>(
-                            'unique_key_for_gameFourPlayers',
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                  child: const Text("4 Players"),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.black,
-                    backgroundColor: Colors.greenAccent,
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ThreePlayers(
-                          key: ValueKey<String>(
-                            'unique_key_for_gameThreePlayers',
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                  child: const Text("3 Players"),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.black,
-                    backgroundColor: Colors.orangeAccent,
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const FivePlayers(
-                          key: ValueKey<String>('unique_key_game_five_players'),
-                        ),
-                      ),
-                    );
-                  },
-                  child: const Text("5 Players"),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.purpleAccent,
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const TwoPlayers(
-                          key: ValueKey<String>(
-                            'unique_key_for_gameTwoPlayers',
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                  child: const Text("2 Players"),
-                ),
-              ),
-            ),
-            // Add buttons for other player counts...
-          ],
-        ),
-      );
-    },
-  );
+  _showSelectionDialog(context, 'Choose player count', [
+    _SelectionOption('Two players', Icons.people_outline_rounded, () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const TwoPlayers(key: ValueKey('unique_key_for_gameTwoPlayers'))))),
+    _SelectionOption('Three players', Icons.people_outline_rounded, () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ThreePlayers(key: ValueKey('unique_key_for_gameThreePlayers'))))),
+    _SelectionOption('Four players', Icons.groups_rounded, () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FourPlayers(key: ValueKey('unique_key_for_gameFourPlayers'))))),
+    _SelectionOption('Five players', Icons.groups_rounded, () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FivePlayers(key: ValueKey('unique_key_game_five_players'))))),
+  ]);
 }
 
 void _showPlaneSetSelectionDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text(
-          "Select Set of Planes \n You Want to Play with",
-          textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: SizedBox(
-                width: double.infinity, // Ensures uniform button width
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.blueAccent,
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PlaneChase(
-                          key: const ValueKey<String>(
-                            'unique_key_for_Plane_Chase',
-                          ),
-                          apiUrl: fetchAllPlanes,
-                        ),
-                      ),
-                    );
-                  },
-                  child: const Text("All Planes"),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: SizedBox(
-                width: double.infinity, // Ensures uniform button width
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.black,
-                    backgroundColor: Colors.greenAccent,
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PlaneChase(
-                          key: const ValueKey<String>(
-                            'unique_key_for_Plane_Chase',
-                          ),
-                          apiUrl: fetchAnthology,
-                        ),
-                      ),
-                    );
-                  },
-                  child: const Text("Anthology"),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: SizedBox(
-                width: double.infinity, // Ensures uniform button width
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.black,
-                    backgroundColor: Colors.orangeAccent,
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PlaneChase(
-                          key: const ValueKey<String>(
-                            'unique_key_for_Plane_Chase',
-                          ),
-                          apiUrl: fetchMOM,
-                        ),
-                      ),
-                    );
-                  },
-                  child: const Text("March of the Machine"),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: SizedBox(
-                width: double.infinity, // Ensures uniform button width
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.purpleAccent,
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PlaneChase(
-                          key: const ValueKey<String>(
-                            'unique_key_for_Plane_Chase',
-                          ),
-                          apiUrl: fetchWHO,
-                        ),
-                      ),
-                    );
-                  },
-                  child: const Text("Dr Who"),
-                ),
-              ),
-            ),
-            // Add buttons for other player counts...
-          ],
-        ),
-      );
-    },
-  );
+  _showSelectionDialog(context, 'Choose a Planechase set', [
+    _SelectionOption('All planes', Icons.public_rounded, () => _openPlaneChase(context, fetchAllPlanes)),
+    _SelectionOption('Planechase Anthology', Icons.collections_bookmark_rounded, () => _openPlaneChase(context, fetchAnthology)),
+    _SelectionOption('March of the Machine', Icons.auto_awesome_motion_rounded, () => _openPlaneChase(context, fetchMOM)),
+    _SelectionOption('Doctor Who', Icons.travel_explore_rounded, () => _openPlaneChase(context, fetchWHO)),
+  ]);
 }
 
 void _showMechanicSelectionDialog(BuildContext context) {
-  showDialog(
+  _showSelectionDialog(context, 'Choose a mechanic', [
+    _SelectionOption('The Ring tempts you', Icons.ring_volume_rounded, () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const TheRing(key: ValueKey('unique_key_for_The_Ring'))))),
+    _SelectionOption('Dungeons', Icons.account_tree_rounded, () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const Dungeons(key: ValueKey('unique_key_for_Dungeons'))))),
+  ]);
+}
+
+void _openPlaneChase(BuildContext context, String apiUrl) {
+  Navigator.of(context).push(MaterialPageRoute(
+    builder: (_) => PlaneChase(
+      key: const ValueKey('unique_key_for_Plane_Chase'),
+      apiUrl: apiUrl,
+    ),
+  ));
+}
+
+void _showSelectionDialog(
+  BuildContext context,
+  String title,
+  List<_SelectionOption> options,
+) {
+  showDialog<void>(
     context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text(
-          "Select Mechanic \n You Need An Explanation For",
-          textAlign: TextAlign.center,
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-        ),
-        content: Column(
+    builder: (dialogContext) => AlertDialog(
+      title: Text(title),
+      content: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 360),
+        child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: SizedBox(
-                width: double.infinity, // Ensures uniform button width
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.blueAccent,
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
+          children: [
+            for (final option in options) ...[
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
                   onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const TheRing(
-                          key: ValueKey<String>('unique_key_for_The_Ring'),
-                        ),
-                      ),
-                    );
+                    Navigator.of(dialogContext).pop();
+                    option.onSelected();
                   },
-                  child: const Text("The Ring tempts You"),
+                  icon: Icon(option.icon),
+                  label: Text(option.label),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: SizedBox(
-                width: double.infinity, // Ensures uniform button width
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.black,
-                    backgroundColor: Colors.greenAccent,
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const Dungeons(
-                          key: ValueKey<String>('unique_key_for_Dungeons'),
-                        ),
-                      ),
-                    );
-                  },
-                  child: const Text("Dungeons"),
-                ),
-              ),
-            ),
+              if (option != options.last) const SizedBox(height: 10),
+            ],
           ],
         ),
-      );
-    },
+      ),
+    ),
   );
+}
+
+class _SelectionOption {
+  const _SelectionOption(this.label, this.icon, this.onSelected);
+
+  final String label;
+  final IconData icon;
+  final VoidCallback onSelected;
 }

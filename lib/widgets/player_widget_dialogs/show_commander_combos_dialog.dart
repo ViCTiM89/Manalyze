@@ -35,7 +35,7 @@ class ShowCommanderCombos {
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 24.0,
-                            color: Colors.deepPurpleAccent),
+                            color: appPrimaryColor),
                       ),
                     ),
                     const SizedBox(height: 20),

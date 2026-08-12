@@ -23,7 +23,7 @@ class ShowPlayerLPHistory {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 24.0,
-                  color: Colors.deepPurpleAccent,
+                  color: appPrimaryColor,
                 ),
               ),
             ),
@@ -49,7 +49,7 @@ class ShowPlayerLPHistory {
                               return ListTile(
                                 leading: const Icon(
                                   Icons.history,
-                                  color: Colors.deepPurpleAccent,
+                                  color: appPrimaryColor,
                                 ),
                                 title: Text(
                                   'LP ${index + 1}: ${lpHistory[index]}',

@@ -168,7 +168,7 @@ class _StatisticsDetailPageState extends State<StatisticsDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(gradient: backgroundGradient()),
+      decoration: const BoxDecoration(color: appBackgroundColor),
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,

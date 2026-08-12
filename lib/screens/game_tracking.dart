@@ -158,9 +158,7 @@ class _CommanderGameTrackingState extends State<CommanderGameTracking> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        gradient: backgroundGradient(),
-      ),
+      decoration: const BoxDecoration(color: appBackgroundColor),
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         backgroundColor: Colors.transparent,

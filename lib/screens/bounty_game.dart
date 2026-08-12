@@ -1,9 +1,9 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:manalyze/constants.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:manalyze/services/card_api.dart';
-import '../constants.dart';
-import '../model/cards.dart';
+import 'package:manalyze/model/cards.dart';
 import '../widgets/app_bar_widget.dart';
 
 const Color rewardColorActive = Colors.amberAccent;
@@ -17,7 +17,7 @@ const List<String> rewards = [
 ];
 
 class BountyGame extends StatefulWidget {
-  const BountyGame({Key? key}) : super(key: key);
+  const BountyGame({super.key});
 
   @override
   State<BountyGame> createState() => _BountyGameState();
@@ -64,81 +64,63 @@ class _BountyGameState extends State<BountyGame> {
   }
 
   void _showBountiesDialog(BuildContext context) {
-    showDialog(
+    showDialog<void>(
       context: context,
-      builder: (BuildContext context) {
+      builder: (dialogContext) {
         return AlertDialog(
-          title: Text('Bounties: ${bounties.length}'),
+          title: Text(
+            'Bounties (${bounties.length})',
+            style: Theme.of(dialogContext).textTheme.titleLarge?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
           content: SizedBox(
-            width: double.maxFinite,
-            child: ListView.builder(
-              shrinkWrap: true,
+            width: 420,
+            height: 460,
+            child: ListView.separated(
               itemCount: bounties.length,
+              separatorBuilder: (_, _) => const Divider(height: 1),
               itemBuilder: (context, index) {
-                final dungeon = bounties[index];
-                final name = dungeon.name;
-                final typeLine = dungeon.typeLine;
+                final bounty = bounties[index];
                 return ListTile(
                   leading: CircleAvatar(
-                    backgroundColor: Colors.deepPurpleAccent,
+                    backgroundColor: appPrimaryColor,
                     child: Text(
                       '${index + 1}',
                       style: const TextStyle(color: Colors.white),
                     ),
                   ),
                   title: Text(
-                    name,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    bounty.name,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                  subtitle: Text(typeLine),
                   trailing: const Icon(
-                    Icons.arrow_forward,
-                    color: Colors.deepPurpleAccent,
+                    Icons.open_in_full_rounded,
+                    color: appPrimaryColor,
                   ),
                   onLongPress: () {
                     setState(() {
                       currentImageUrl =
-                          dungeon.imageUris?.large ??
-                          dungeon.cardFaces![0].imageUris.large;
+                          bounty.imageUris?.large ??
+                          bounty.cardFaces![0].imageUris.large;
                     });
-                    Navigator.of(context).pop();
+                    Navigator.of(dialogContext).pop();
                   },
                 );
               },
             ),
           ),
-          actions: <Widget>[
-            Center(
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: Container(
-                  height: 50.0,
-                  width: 150.0,
-                  decoration: BoxDecoration(
-                    color: Colors.deepPurpleAccent,
-                    borderRadius: BorderRadius.circular(15.0),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        spreadRadius: 2,
-                        blurRadius: 3,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: const Center(
-                    child: Text(
-                      'Close!',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
+          actionsAlignment: MainAxisAlignment.center,
+          actions: [
+            SizedBox(
+              width: 150,
+              child: ElevatedButton(
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: const Text('Close'),
               ),
             ),
           ],
@@ -159,7 +141,7 @@ class _BountyGameState extends State<BountyGame> {
     double rewardLevelWidth = screenWidth;
 
     return Container(
-      decoration: BoxDecoration(gradient: backgroundGradient()),
+      decoration: const BoxDecoration(color: appBackgroundColor),
       child: Scaffold(
         appBar: const SharedAppBar(backgroundColor: appBarColor),
         backgroundColor: Colors.transparent,

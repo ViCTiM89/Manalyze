@@ -25,7 +25,16 @@ const String drawDescription =
 const String drawConfirmationText = 'Yes, Save as Draw';
 
 // Theme Colors
-const Color appBarColor = Color(0xFF1E1E1E);
+// Shared visual tokens. Keep these values restrained so game content remains
+// the focal point instead of competing with the interface.
+const Color appBarColor = Color(0xFF111827);
+const Color appPrimaryColor = Color(0xFF7C3AED);
+const Color appSurfaceColor = Color(0xFF1F2937);
+const Color appBackgroundColor = Color(0xFF0F172A);
+const Color appButtonColor = Color(0xFF334155);
+const Color appButtonBorderColor = Color(0xFF475569);
+const double appRadius = 16;
+const double appSpacing = 16;
 //Text colors
 const Color shadowStatus = Colors.white24;
 const Color shadowDecrement = Colors.red;
@@ -61,18 +70,11 @@ String fetchWHO =
 String fetchAllBounties =
     'https://api.scryfall.com/cards/search?q=bounty+t%3Acard+o%3Abounty';
 
-LinearGradient backgroundGradient() {
-  return const LinearGradient(
-    colors: [Color(0xFF5D54A4), Color(0xFF8F94FB)],
-    begin: Alignment.topRight,
-    end: Alignment.bottomLeft,
-  );
-}
-
 BoxDecoration buttonDecoration() {
   return BoxDecoration(
-    color: Colors.deepPurpleAccent,
-    borderRadius: BorderRadius.circular(15.0),
+    color: appButtonColor,
+    borderRadius: BorderRadius.circular(appRadius),
+    border: Border.all(color: appButtonBorderColor),
     boxShadow: [
       BoxShadow(
         color: Colors.black.withOpacity(0.2),
