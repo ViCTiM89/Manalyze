@@ -15,9 +15,19 @@ import 'screens/statistics_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await MongoService.init('Commanders');
 
   runApp(const ManalyzeApp());
+
+  Future.microtask(() async {
+    try {
+      debugPrint('Starting MongoDB initialization');
+      await MongoService.init('Commanders');
+      debugPrint('MongoDB initialization successful');
+    } catch (e, stackTrace) {
+      debugPrint('MongoDB initialization FAILED: $e');
+      debugPrintStack(stackTrace: stackTrace);
+    }
+  });
 }
 
 class ManalyzeApp extends StatelessWidget {
@@ -103,7 +113,7 @@ class FirstRoute extends StatelessWidget {
                     onTap: () => _showPlayerSelectionDialog(context),
                   ),
                   _GameButton(
-                    text: 'Planechase',
+                    text: 'Plane Chase',
                     imagePath: 'images/thb-251-island.jpg',
                     icon: Icons.public_rounded,
                     onTap: () => _showPlaneSetSelectionDialog(context),
@@ -241,9 +251,7 @@ class _HomeHeader extends StatelessWidget {
             style: TextStyle(fontSize: 28, fontWeight: FontWeight.w700),
           ),
           SizedBox(height: 6),
-          Text(
-            'Choose a tool to start playing or review commander stats.',
-          ),
+          Text('Choose a tool to start playing or review commander stats.'),
         ],
       ),
     );

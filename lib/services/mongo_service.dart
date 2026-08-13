@@ -8,9 +8,9 @@ class MongoService {
   static late DbCollection _commanderCollection;
 
   static Future<void> init(String collectionName) async {
-    _db = await Db.create(apiKey);
-    await _db.open();
-    _commanderCollection = _db.collection(collectionName);
+      _db = await Db.create(apiKey);
+      await _db.open();
+      _commanderCollection = _db.collection(collectionName);
   }
 
   static Future<List<String>> searchCommanders(String query) async {
@@ -18,9 +18,14 @@ class MongoService {
       final results = await _commanderCollection
           .find(
             where
-                .match('name', query,
-                    caseInsensitive: true, escapePattern: true)
-                .fields(['name']).limit(_maxAutocompleteResults),
+                .match(
+                  'name',
+                  query,
+                  caseInsensitive: true,
+                  escapePattern: true,
+                )
+                .fields(['name'])
+                .limit(_maxAutocompleteResults),
           )
           .toList();
 
@@ -35,15 +40,25 @@ class MongoService {
       final results = await _commanderCollection
           .find(
             where
-                .match('name', query,
-                    caseInsensitive: true, escapePattern: true)
+                .match(
+                  'name',
+                  query,
+                  caseInsensitive: true,
+                  escapePattern: true,
+                )
                 .and(
-                  where.oneFrom('keywords', ['Partner', 'Doctor\'s companion']).or(
-                        where.match('type_line', 'Background',
-                            caseInsensitive: true),
+                  where
+                      .oneFrom('keywords', ['Partner', 'Doctor\'s companion'])
+                      .or(
+                        where.match(
+                          'type_line',
+                          'Background',
+                          caseInsensitive: true,
+                        ),
                       ),
                 )
-                .fields(['name']).limit(_maxAutocompleteResults),
+                .fields(['name'])
+                .limit(_maxAutocompleteResults),
           )
           .toList();
 
@@ -58,10 +73,15 @@ class MongoService {
       final results = await _commanderCollection
           .find(
             where
-                .match('name', query,
-                    caseInsensitive: true, escapePattern: true)
+                .match(
+                  'name',
+                  query,
+                  caseInsensitive: true,
+                  escapePattern: true,
+                )
                 .eq('keywords', 'Companion')
-                .fields(['name']).limit(_maxAutocompleteResults),
+                .fields(['name'])
+                .limit(_maxAutocompleteResults),
           )
           .toList();
 
@@ -72,7 +92,9 @@ class MongoService {
   }
 
   static Future<void> insertDocument(
-      String collectionName, Map<String, dynamic> document) async {
+    String collectionName,
+    Map<String, dynamic> document,
+  ) async {
     try {
       final collection = _db.collection(collectionName);
       await collection.insertOne(document);
@@ -82,7 +104,9 @@ class MongoService {
   }
 
   static Future<void> insertMany(
-      String collectionName, List<Map<String, dynamic>> documents) async {
+    String collectionName,
+    List<Map<String, dynamic>> documents,
+  ) async {
     try {
       final collection = _db.collection(collectionName);
       await collection.insertMany(documents);
@@ -92,7 +116,9 @@ class MongoService {
   }
 
   static Future<void> upsertStats(
-      String collectionName, Map<String, dynamic> game) async {
+    String collectionName,
+    Map<String, dynamic> game,
+  ) async {
     try {
       final collection = _db.collection(collectionName);
 
@@ -105,18 +131,15 @@ class MongoService {
         ..inc('Games', 1)
         ..inc('Wins', game['isWin'] == true ? 1 : 0);
 
-      await collection.updateOne(
-        query,
-        update,
-        upsert: true,
-      );
+      await collection.updateOne(query, update, upsert: true);
     } catch (e) {
       log('Error updating stats: $e');
     }
   }
 
   static Future<List<Map<String, dynamic>>> fetchSortedStats(
-      String collectionName) async {
+    String collectionName,
+  ) async {
     try {
       final collection = _db.collection(collectionName);
       final results = await collection.find().toList();
